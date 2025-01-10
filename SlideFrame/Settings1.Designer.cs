@@ -82,5 +82,17 @@ namespace SlideFrame {
                 this["Playing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Sort {
+            get {
+                return ((string)(this["Sort"]));
+            }
+            set {
+                this["Sort"] = value;
+            }
+        }
     }
 }

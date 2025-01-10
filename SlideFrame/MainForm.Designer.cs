@@ -33,9 +33,11 @@
 			contextMenuStrip = new ContextMenuStrip(components);
 			playToolStripMenuItem = new ToolStripMenuItem();
 			pauseToolStripMenuItem = new ToolStripMenuItem();
+			firstToolStripMenuItem = new ToolStripMenuItem();
 			fullscreenToolStripMenuItem = new ToolStripMenuItem();
 			sortToolStripMenuItem = new ToolStripMenuItem();
 			timeToolStripMenuItem = new ToolStripMenuItem();
+			timeDescendingToolStripMenuItem = new ToolStripMenuItem();
 			nameToolStripMenuItem = new ToolStripMenuItem();
 			shuffleToolStripMenuItem = new ToolStripMenuItem();
 			intervalToolStripMenuItem = new ToolStripMenuItem();
@@ -49,15 +51,15 @@
 			// contextMenuStrip
 			// 
 			contextMenuStrip.ImageScalingSize = new Size(28, 28);
-			contextMenuStrip.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, pauseToolStripMenuItem, fullscreenToolStripMenuItem, sortToolStripMenuItem, intervalToolStripMenuItem, folderToolStripMenuItem, exitToolStripMenuItem });
+			contextMenuStrip.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, pauseToolStripMenuItem, firstToolStripMenuItem, fullscreenToolStripMenuItem, sortToolStripMenuItem, intervalToolStripMenuItem, folderToolStripMenuItem, exitToolStripMenuItem });
 			contextMenuStrip.Name = "contextMenuStrip1";
-			contextMenuStrip.Size = new Size(283, 294);
+			contextMenuStrip.Size = new Size(218, 292);
 			// 
 			// playToolStripMenuItem
 			// 
 			playToolStripMenuItem.Image = Properties.Resources.StatusAnnotations_Play_32xLG_color;
 			playToolStripMenuItem.Name = "playToolStripMenuItem";
-			playToolStripMenuItem.Size = new Size(282, 36);
+			playToolStripMenuItem.Size = new Size(217, 36);
 			playToolStripMenuItem.Text = "Play";
 			playToolStripMenuItem.Click += playToolStripMenuItem_Click;
 			// 
@@ -65,22 +67,30 @@
 			// 
 			pauseToolStripMenuItem.Image = Properties.Resources.StatusAnnotations_Pause_32xLG_color;
 			pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-			pauseToolStripMenuItem.Size = new Size(282, 36);
+			pauseToolStripMenuItem.Size = new Size(217, 36);
 			pauseToolStripMenuItem.Text = "Pause";
 			pauseToolStripMenuItem.Click += pauseToolStripMenuItem_Click;
+			// 
+			// firstToolStripMenuItem
+			// 
+			firstToolStripMenuItem.Image = Properties.Resources.DataContainer_MoveFirstHS;
+			firstToolStripMenuItem.Name = "firstToolStripMenuItem";
+			firstToolStripMenuItem.Size = new Size(217, 36);
+			firstToolStripMenuItem.Text = "First";
+			firstToolStripMenuItem.Click += firstToolStripMenuItem_Click;
 			// 
 			// fullscreenToolStripMenuItem
 			// 
 			fullscreenToolStripMenuItem.Name = "fullscreenToolStripMenuItem";
-			fullscreenToolStripMenuItem.Size = new Size(282, 36);
+			fullscreenToolStripMenuItem.Size = new Size(217, 36);
 			fullscreenToolStripMenuItem.Text = "Full Screen";
 			fullscreenToolStripMenuItem.Click += fullscreenToolStripMenuItem_Click;
 			// 
 			// sortToolStripMenuItem
 			// 
-			sortToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { timeToolStripMenuItem, nameToolStripMenuItem, shuffleToolStripMenuItem });
+			sortToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { timeToolStripMenuItem, timeDescendingToolStripMenuItem, nameToolStripMenuItem, shuffleToolStripMenuItem });
 			sortToolStripMenuItem.Name = "sortToolStripMenuItem";
-			sortToolStripMenuItem.Size = new Size(282, 36);
+			sortToolStripMenuItem.Size = new Size(217, 36);
 			sortToolStripMenuItem.Text = "Sort";
 			// 
 			// timeToolStripMenuItem
@@ -88,42 +98,49 @@
 			timeToolStripMenuItem.Checked = true;
 			timeToolStripMenuItem.CheckState = CheckState.Checked;
 			timeToolStripMenuItem.Name = "timeToolStripMenuItem";
-			timeToolStripMenuItem.Size = new Size(196, 40);
-			timeToolStripMenuItem.Text = "Time";
+			timeToolStripMenuItem.Size = new Size(291, 40);
+			timeToolStripMenuItem.Text = "Time Ascending";
 			timeToolStripMenuItem.Click += sortToolStripMenuItem_Click;
+			// 
+			// timeDescendingToolStripMenuItem
+			// 
+			timeDescendingToolStripMenuItem.Name = "timeDescendingToolStripMenuItem";
+			timeDescendingToolStripMenuItem.Size = new Size(291, 40);
+			timeDescendingToolStripMenuItem.Text = "Time Descending";
+			timeDescendingToolStripMenuItem.Click += sortToolStripMenuItem_Click;
 			// 
 			// nameToolStripMenuItem
 			// 
 			nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-			nameToolStripMenuItem.Size = new Size(196, 40);
+			nameToolStripMenuItem.Size = new Size(291, 40);
 			nameToolStripMenuItem.Text = "Name";
 			nameToolStripMenuItem.Click += sortToolStripMenuItem_Click;
 			// 
 			// shuffleToolStripMenuItem
 			// 
 			shuffleToolStripMenuItem.Name = "shuffleToolStripMenuItem";
-			shuffleToolStripMenuItem.Size = new Size(196, 40);
+			shuffleToolStripMenuItem.Size = new Size(291, 40);
 			shuffleToolStripMenuItem.Text = "Shuffle";
 			shuffleToolStripMenuItem.Click += sortToolStripMenuItem_Click;
 			// 
 			// intervalToolStripMenuItem
 			// 
 			intervalToolStripMenuItem.Name = "intervalToolStripMenuItem";
-			intervalToolStripMenuItem.Size = new Size(282, 36);
+			intervalToolStripMenuItem.Size = new Size(217, 36);
 			intervalToolStripMenuItem.Text = "Set Interval...";
 			intervalToolStripMenuItem.Click += intervalToolStripMenuItem_Click;
 			// 
 			// folderToolStripMenuItem
 			// 
 			folderToolStripMenuItem.Name = "folderToolStripMenuItem";
-			folderToolStripMenuItem.Size = new Size(282, 36);
+			folderToolStripMenuItem.Size = new Size(217, 36);
 			folderToolStripMenuItem.Text = "Set Folder...";
 			folderToolStripMenuItem.Click += folderToolStripMenuItem_Click;
 			// 
 			// exitToolStripMenuItem
 			// 
 			exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			exitToolStripMenuItem.Size = new Size(282, 36);
+			exitToolStripMenuItem.Size = new Size(217, 36);
 			exitToolStripMenuItem.Text = "Exit";
 			exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
 			// 
@@ -147,6 +164,7 @@
 			ClientSize = new Size(1377, 849);
 			ContextMenuStrip = contextMenuStrip;
 			Controls.Add(MediaPlayer);
+			Icon = (Icon)resources.GetObject("$this.Icon");
 			Name = "MainForm";
 			Text = "Slide Frame";
 			FormClosing += MainForm_FormClosing;
@@ -172,5 +190,7 @@
 		private ToolStripMenuItem exitToolStripMenuItem;
 		private ToolStripMenuItem intervalToolStripMenuItem;
 		private ToolStripMenuItem folderToolStripMenuItem;
+		private ToolStripMenuItem timeDescendingToolStripMenuItem;
+		private ToolStripMenuItem firstToolStripMenuItem;
 	}
 }

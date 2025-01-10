@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>slideshow.ico</ApplicationIcon>
+	<AssemblyTitle>Slide Frame</AssemblyTitle>
+	<Description>Slide Show for standalone picture frame</Description>
+	<Copyright>Copyright © 2025 Forest Moon Productions</Copyright>
+	<Version>1.0.0</Version>
+	<PackageProjectUrl>https://github.com/ScottFerg56/SlideFrame</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +32,10 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="slideshow.ico" />
   </ItemGroup>
 
   <ItemGroup>

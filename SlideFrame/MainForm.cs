@@ -12,8 +12,13 @@ UI:
 	context menu:
 		Play
 		Pause
+		First
 		toggle Full Screen
 		change Sort
+			Time Ascending
+			Time Descending
+			Name
+			Shuffle
 		change Interval
 		change image Folder
 		Exit
@@ -24,11 +29,12 @@ UI:
 		Media Previous Track for previous slide
 		Media Next Track for next slide
 		Media Play Pause to toggle Playing
+		Home to go to first slide
 		F11 to toggle Fullscreen
  */
 
 /*
-TODO:
+CONSIDER:
 	log for error messages and file ops?
 	caption for date? description?
  */
@@ -50,22 +56,22 @@ namespace SlideFrame
 		private static int SlidesInterval = 5000;
 
 		// timer for images folder updates
-		private System.Windows.Forms.Timer FolderTimer = new() { Interval = 60000, Enabled = true };
+		private readonly System.Windows.Forms.Timer FolderTimer = new() { Interval = 60000, Enabled = true };
 
 		// timer for slide changes
-		private System.Windows.Forms.Timer SlidesTimer = new() { Interval = SlidesInterval, Enabled = false };
+		private readonly System.Windows.Forms.Timer SlidesTimer = new() { Interval = SlidesInterval, Enabled = false };
 
 		// path to images folder
 		private string SlidesFolder = ""; // @"C:\Users\Scott\Slides"
 
 		// slides loaded from folder and sorted
-		private List<Slide> Slides = new();
+		private readonly List<Slide> Slides = [];
 
 		// the current slide being displayed
 		private Slide? CurrSlide = null;
 
 		// random number generate for slide shuffle
-		private Random Random = new Random();
+		private readonly Random Random = new();
 
 		/// <summary>
 		/// Control slide advantment via timer
@@ -103,12 +109,12 @@ namespace SlideFrame
 		{
 			if (MediaPlayer.Visible)
 				return;
-			MediaPlayer.uiMode = "none";			// no play control toolbar
+			MediaPlayer.uiMode = "none";            // no play control toolbar
 			SizeMediaPlayer();
-			MediaPlayer.settings.volume = 0;		// no sound
-			MediaPlayer.Visible = true;				// make it visible
-			MediaPlayer.enableContextMenu = false;	// disable the player's own video control menu
-			MediaPlayer.Enabled = false;			// disable so all interactions pass through to the form
+			MediaPlayer.settings.volume = 0;        // no sound
+			MediaPlayer.Visible = true;             // make it visible
+			MediaPlayer.enableContextMenu = false;  // disable the player's own video control menu
+			MediaPlayer.Enabled = false;            // disable so all interactions pass through to the form
 		}
 
 		/// <summary>
@@ -118,8 +124,8 @@ namespace SlideFrame
 		{
 			if (!MediaPlayer.Visible)
 				return;
-			MediaPlayer.Ctlcontrols.stop();			// stop any playing video
-			MediaPlayer.Visible = false;			// hide the control so images show on the background
+			MediaPlayer.Ctlcontrols.stop();         // stop any playing video
+			MediaPlayer.Visible = false;            // hide the control so images show on the background
 			MediaPlayer.enableContextMenu = false;  // disable the player's own video control menu
 			MediaPlayer.Enabled = false;            // disable so all interactions pass through to the form
 		}
@@ -145,24 +151,45 @@ namespace SlideFrame
 			}
 		}
 
-		private enum SortKind { Time, Name, Shuffle };
+		private enum SortKind { TimeAscending, TimeDescending, Name, Shuffle };
 
+		private SortKind _Sort = SortKind.TimeAscending;
 		/// <summary>
 		/// Ways to sort the images for display
 		/// </summary>
-		private SortKind Sort = SortKind.Time;
+		private SortKind Sort
+		{
+			get => _Sort;
+			set
+			{
+				if (value == _Sort)
+					return;
+				_Sort = value;
+				var item = timeToolStripMenuItem.Owner?.Items.OfType<ToolStripMenuItem>().First(i => i.Text?.Replace(" ", "") == value.ToString());
+				// Clear the checked state for all items
+				if (item is not null)
+				{
+					if (item.Owner is not null)
+					{
+						foreach (var sib in item.Owner.Items.OfType<ToolStripMenuItem>())
+							sib.Checked = false;
+					}
+					item.Checked = true;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Represent a slide image or video
 		/// </summary>
 		private class Slide
 		{
-			public string FullPath;			// path to the media
-			public DateTime Time;		// timestamp for sorting
-			public int Rand;			// random number for shuffle sort
-			public bool Exists;			// flag for folder update tracking of deleted items
-			public bool IsVideo;		// the slide is a video
-			public bool Invalid;		// not an image or video (removed from the list)
+			public string FullPath;         // path to the media
+			public DateTime Time;       // timestamp for sorting
+			public int Rand;            // random number for shuffle sort
+			public bool Exists;         // flag for folder update tracking of deleted items
+			public bool IsVideo;        // the slide is a video
+			public bool Invalid;        // not an image or video (removed from the list)
 			public int Orientation;     // EXIF data from image for proper rotation during display
 
 			public string Name => Path.GetFileName(FullPath);
@@ -460,8 +487,7 @@ namespace SlideFrame
 				{
 					// need to re-sort after changes to the list
 					SortSlides();
-					if (CurrSlide is null)
-						CurrSlide = Slides.First();
+					CurrSlide ??= Slides.First();
 				}
 			}
 			catch (Exception ex)
@@ -477,8 +503,11 @@ namespace SlideFrame
 		{
 			switch (Sort)
 			{
-				case SortKind.Time:
+				case SortKind.TimeAscending:
 					Slides.Sort((a, b) => DateTime.Compare(a.Time, b.Time));
+					break;
+				case SortKind.TimeDescending:
+					Slides.Sort((a, b) => -DateTime.Compare(a.Time, b.Time));
 					break;
 				case SortKind.Name:
 					Slides.Sort((a, b) => string.Compare(a.Name, b.Name));
@@ -521,6 +550,15 @@ namespace SlideFrame
 		}
 
 		/// <summary>
+		/// Set current slide to the first slide
+		/// </summary>
+		private void firstToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			CurrSlide = Slides.FirstOrDefault();
+			ShowSlide();
+		}
+
+		/// <summary>
 		/// Context menu Full Screen toggle command
 		/// </summary>
 		private void fullscreenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -533,15 +571,10 @@ namespace SlideFrame
 		/// </summary>
 		private void sortToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			var item = sender as ToolStripMenuItem;
-			if (item is null || item.Owner is null)
+			if (sender is not ToolStripMenuItem item || item.Owner is null)
 				return;
-			// Clear the checked state for all siblings.
-			foreach (var sib in item.Owner.Items.OfType<ToolStripMenuItem>().Where(i => i != item && i.Checked))
-				sib.Checked = false;
-			item.Checked = true;
 			// get the SortKind from the menu text
-			Sort = (SortKind)Enum.Parse(typeof(SortKind), item.Text ?? "Time");
+			Sort = (SortKind)Enum.Parse(typeof(SortKind), item.Text?.Replace(" ", "") ?? "TimeAscending");
 			SortSlides();
 		}
 
@@ -567,11 +600,13 @@ namespace SlideFrame
 		private void folderToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			// simple use of standard folder browser
-			FolderBrowserDialog dialog = new FolderBrowserDialog();
-			dialog.Description = "Select images folder";
-			dialog.ShowNewFolderButton = false;
-			dialog.RootFolder = Environment.SpecialFolder.Personal;
-			dialog.SelectedPath = SlidesFolder ?? "";
+			FolderBrowserDialog dialog = new()
+			{
+				Description = "Select images folder",
+				ShowNewFolderButton = false,
+				RootFolder = Environment.SpecialFolder.Personal,
+				SelectedPath = SlidesFolder ?? ""
+			};
 			if (dialog.ShowDialog() == DialogResult.OK)
 			{
 				SetFolder(dialog.SelectedPath);
@@ -629,6 +664,10 @@ namespace SlideFrame
 				case Keys.F11:
 					Fullscreen = !Fullscreen;
 					break;
+				case Keys.Home:
+					CurrSlide = Slides.FirstOrDefault();
+					ShowSlide();
+					break;
 			}
 		}
 
@@ -639,12 +678,12 @@ namespace SlideFrame
 		{
 			if (MediaPlayer.currentMedia is null)
 				return;
-			SizeMediaPlayer();		// JIC
-			// Set the SlidesTimer based on the video duration
-			// we have to wait until the player has loaded the video after setting it in ShowSlide for valid values
-			// then we can calculate the video's remaining time and set the timer
-			// NOTE: for some reason we seem to get called here twice for each video started
-			//		so we update based on the current position
+			SizeMediaPlayer();      // JIC
+									// Set the SlidesTimer based on the video duration
+									// we have to wait until the player has loaded the video after setting it in ShowSlide for valid values
+									// then we can calculate the video's remaining time and set the timer
+									// NOTE: for some reason we seem to get called here twice for each video started
+									//		so we update based on the current position
 			var dur = MediaPlayer.currentMedia.duration;
 			var pos = MediaPlayer.Ctlcontrols.currentPosition;
 			var rem = (short)Math.Ceiling((dur - pos) * 1000);
@@ -663,7 +702,7 @@ namespace SlideFrame
 			// form Bounds
 			if (!string.IsNullOrEmpty(Settings1.Default.Bounds))
 			{
-				RectangleConverter conv = new RectangleConverter();
+				RectangleConverter conv = new();
 				var o = conv.ConvertFromString(Settings1.Default.Bounds);
 				if (o is not null)
 					Bounds = (Rectangle)o;
@@ -671,7 +710,11 @@ namespace SlideFrame
 			// WindowState (Full Screen)
 			if (Enum.TryParse(Settings1.Default.State, out FormWindowState state))
 			{
-				WindowState = state;	// this will be seen in SizeChanged and set FullScreen
+				WindowState = state;    // this will be seen in SizeChanged and set FullScreen
+			}
+			if (Enum.TryParse(Settings1.Default.Sort, out SortKind sort))
+			{
+				Sort = sort;
 			}
 			// SlidesFolder
 			SetFolder(Settings1.Default.Folder);
@@ -690,10 +733,11 @@ namespace SlideFrame
 			Settings1.Default.Playing = Playing;
 			Settings1.Default.Interval = SlidesInterval;
 			Settings1.Default.State = WindowState.ToString();
+			Settings1.Default.Sort = Sort.ToString();
 			// set the Normal state so we can save the Normal Bounds
 			// NOTE: RestoreBounds property should work here but did not!
 			WindowState = FormWindowState.Normal;
-			RectangleConverter conv = new RectangleConverter();
+			RectangleConverter conv = new();
 			Settings1.Default.Bounds = conv.ConvertToString(Bounds) ?? "";
 			Settings1.Default.Save();
 		}
