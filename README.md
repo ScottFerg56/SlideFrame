@@ -19,10 +19,10 @@ which will be required to be installed on first run, if not already present on t
 * Set Interval...
 * Set Folder...
 * Exit
-## Mouse
+### Mouse
 * click left half of window for previous slide
 * click right half of window for next slide
-## Keyboard
+### Keyboard
 * Media Previous Track for previous slide
 * Media Next Track for next slide
 * Media Play Pause to toggle Playing
